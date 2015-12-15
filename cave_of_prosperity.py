@@ -22,7 +22,7 @@ def choose(cap, weight, pieces, chosen=[]):
 		return choose(cap, weight, pieces[1:], chosen)
 	else:
 		a = choose(cap, weight + pieces[0], pieces[1:],
-					  chosen + list(pieces[0]))
+					  chosen + [pieces[0]])
 		b = choose(cap, weight, pieces[1:], chosen)
 		if sum(a) >= sum(b):
 			return a
@@ -49,7 +49,7 @@ if __name__ == "__main__":
 	pieces = []
 	for x in range(nuggets):
 		pieces.append(make_int(eval(source.readline())))
-	chosen = map(make_float, choose(cap, 0, pieces))
+	chosen = list(map(make_float, choose(cap, 0, pieces)))
 	a = 1
 	name = "output" + str(a)
 	while os.path.exists(name):
@@ -58,7 +58,7 @@ if __name__ == "__main__":
 	out = open(name, 'w')
 	out.write(str(sum(chosen)))
 	for x in chosen:
-		out.write(str(x))
+		out.write("\n" + str(x))
 	out.close()
 
 
