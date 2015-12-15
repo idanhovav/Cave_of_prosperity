@@ -42,7 +42,7 @@ def make_float(x):
 
 
 if __name__ == "__main__":
-	response = input("File Name? ")
+	response = "in/" + input("File Name? ")
 	source = open(response, 'r')
 	cap = make_int(eval(source.readline()) )
 	nuggets = eval(source.readline())
