@@ -1,0 +1,263 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1348\cocoasubrtf170
+{\fonttbl\f0\fnil\fcharset0 Monaco;}
+{\colortbl;\red255\green255\blue255;\red127\green0\blue85;\red63\green127\blue95;\red0\green0\blue192;
+\red106\green62\blue62;\red42\green0\blue255;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720
+
+\f0\fs22 \cf2 package\cf0  eventplanner;\
+\
+\cf2 import\cf0  java.util.Scanner;\
+\
+\cf2 public\cf0  \cf2 class\cf0  BagOfGold \{\
+	\
+	\cf3 //stores carrying capacity\cf0 \
+	\cf2 float\cf0  \cf4 cap\cf0 ;\
+	\
+	\cf3 //stores number of bars\cf0 \
+	\cf2 int\cf0  \cf4 bars\cf0 ;\
+	\
+	\cf3 //stores weights of bars\cf0 \
+	\cf2 float\cf0 [] \cf4 weights\cf0 ;\
+	\
+	\cf3 //next row's possibilities that are already counted\cf0 \
+	\cf2 int\cf0 [] \cf4 nextpossibilities\cf0 ;\
+	\
+	\cf3 //used to get user input\cf0 \
+	Scanner \cf4 scanner\cf0  = \cf2 new\cf0  Scanner(System.\cf4 in\cf0 );\
+	\
+\
+	\cf2 public\cf0  BagOfGold(\cf2 float\cf0  \cf5 cap\cf0 , \cf2 int\cf0  \cf5 bars\cf0 ) \{\
+		\cf3 //initialize values\cf0 \
+		\cf2 this\cf0 .\cf4 cap\cf0  = \cf5 cap\cf0 ;\
+		\cf2 this\cf0 .\cf4 bars\cf0  = \cf5 bars\cf0 ;\
+		\
+		\cf3 //initialize size of weights array based on number of bars\cf0 \
+		\cf4 weights\cf0  = \cf2 new\cf0  \cf2 float\cf0 [\cf5 bars\cf0 ];\
+		\
+		\cf3 //only need it for after 1st row, so bars-1\cf0 \
+		\cf4 nextpossibilities\cf0  = \cf2 new\cf0  \cf2 int\cf0 [\cf5 bars\cf0 -1];\
+		\
+		\cf3 //initialized to 0\cf0 \
+		\cf2 for\cf0 (\cf2 int\cf0  \cf5 i\cf0  = 0; \cf5 i\cf0  < \cf4 nextpossibilities\cf0 .\cf4 length\cf0 ; \cf5 i\cf0 ++)\
+		\{\
+			\cf4 nextpossibilities\cf0 [\cf5 i\cf0 ] = 0;\
+		\}\
+		\
+		\cf3 /*3D array that stores in order:\cf0 \
+\pard\pardeftab720
+\cf3 		*the total weight of that combo\cf0 \
+\cf3 		*the weights of the bars in combo\cf0 \
+\cf3 		*\cf0 \
+\cf3 		*Therefore, the rows of the array is the different cardinalities\cf0 \
+\cf3 		*the squares in each row represent the types of combinations possible\cf0 \
+\cf3 		*within those squares are arrays that store the total weight of that combo first\cf0 \
+\cf3 		*then the number of sets w/cardinality 1 greater that start with that set\cf0 \
+\cf3 		*then the weights of the bars in that combo\cf0 \
+\cf3 		*It looks like a 2D array that has an array in each square \cf0 \
+\cf3 		*/\cf0 \
+		\
+		\cf3 //\ul nvm\ulnone  \ul gotta\ulnone  break it up b/c not same amount of \ul combos\ulnone  in each, so not a square\cf0 \
+		\cf2 float\cf0 [][][] \cf5 combos\cf0 ;\
+		\
+		\cf3 //\cf0 \
+		\
+		\cf3 //user inputs weights, store weights in array\cf0 \
+		\cf2 for\cf0 (\cf2 int\cf0  \cf5 i\cf0  = 0; \cf5 i\cf0  < \cf4 weights\cf0 .\cf4 length\cf0 ; \cf5 i\cf0 ++)\
+		\{\
+			System.\cf4 out\cf0 .println(\cf6 "Please enter the weight of bar #"\cf0  + \cf5 i\cf0 +1 + \cf6 ": "\cf0 );\
+			\cf4 weights\cf0 [\cf5 i\cf0 ] = \cf4 scanner\cf0 .nextFloat();\
+		\}\
+		\
+		\
+		\cf3 //number of rows in array based on number of bars,\cf0 \
+		\cf3 //since each row represents all the combinations possible\cf0 \
+		\cf3 //with a specific cardinality\cf0 \
+		\cf5 combos\cf0  = \cf2 new\cf0  \cf2 float\cf0 [\cf5 bars\cf0 ][][];\
+		\
+		\cf2 for\cf0 (\cf2 int\cf0  \cf5 i\cf0  = 0; \cf5 i\cf0  < \cf5 combos\cf0 .\cf4 length\cf0 ; \cf5 i\cf0 ++)\
+		\{\
+			\cf3 //putting i+1 instead of i b/c 0th row stores cardinality 1, etc.\cf0 \
+			\cf3 //how many squares in each row? Based on all possible \ul combos\ulnone  bars choose i\cf0 \
+			\cf3 //i + 1 so that we can store the weight of i bars and\cf0 \
+			\cf3 //the total weight of them (+1) and the total possible \ul combos\ulnone  w/this beginning\cf0 \
+			\cf3 //in the next step (+1)\cf0 \
+			\cf5 combos\cf0 [\cf5 i\cf0 ] = \cf2 new\cf0  \cf2 float\cf0 [Combinations(\cf5 bars\cf0 , (\cf5 i\cf0 +1))][(\cf5 i\cf0 +1) + 2];\
+		\}\
+		\
+		\cf3 //loops through squares of first row of array\cf0 \
+		\cf2 for\cf0 (\cf2 int\cf0  \cf5 a\cf0  = 0; \cf5 a\cf0  < \cf5 combos\cf0 [0].\cf4 length\cf0 ; \cf5 a\cf0 ++)\
+		\{\
+			\cf3 //loops through bricks \cf0 \
+			\cf2 for\cf0 (\cf2 int\cf0  \cf5 b\cf0  = 0; \cf5 b\cf0  < \cf4 weights\cf0 .\cf4 length\cf0 ; \cf5 b\cf0 ++)\
+			\{\
+				\cf3 //sum of combo\cf0 \
+				\cf5 combos\cf0 [0][\cf5 a\cf0 ][0] = \cf4 weights\cf0 [\cf5 b\cf0 ];\
+				\
+				\cf3 //bricks used in this combo\cf0 \
+				\cf5 combos\cf0 [0][\cf5 a\cf0 ][2] = \cf4 weights\cf0 [\cf5 b\cf0 ];\
+				\
+				\cf3 //next round \ul num\ulnone  of \ul combinatios\ulnone  w/that start\cf0 \
+				\cf3 //loops through weights to find the last brick of this set\cf0 \
+				\cf3 //subtract's that brick's index from weights length\cf0 \
+				\cf3 //to get the other possible sets for next round\cf0 \
+				\cf2 for\cf0 (\cf2 int\cf0  \cf5 i\cf0  = 0; \cf5 i\cf0  < \cf4 weights\cf0 .\cf4 length\cf0 ; \cf5 i\cf0 ++)\
+				\{\
+					\cf2 if\cf0 (\cf4 weights\cf0 [\cf5 i\cf0 ] == \cf5 combos\cf0 [0][\cf5 a\cf0 ][2])\
+					\{\
+						\cf3 //distance from last bar used to end of bars\cf0 \
+						\cf5 combos\cf0 [0][\cf5 a\cf0 ][0] = \cf4 weights\cf0 .\cf4 length\cf0  - (\cf5 i\cf0 +1);\
+						\
+						\cf3 //starts at end of next possibilities\cf0 \
+						\cf5 combos\cf0 [0][\cf5 a\cf0 ][1] += \cf4 nextpossibilities\cf0 [0];\
+						\
+						\cf3 //update number of next possibilities\cf0 \
+						\cf4 nextpossibilities\cf0 [0] = (\cf2 int\cf0 )\cf5 combos\cf0 [0][\cf5 a\cf0 ][1];\
+						\
+						\cf3 //ADD ANOTHER BRICK TO THIS COMBO\cf0 \
+						\
+					\}\
+				\}\
+				\
+\
+			\}\
+		\}\
+		\
+		\cf3 //looping through cardinalities\cf0 \
+		\cf2 for\cf0 (\cf2 int\cf0  \cf5 a\cf0  = 1; \cf5 a\cf0 <\cf5 combos\cf0 .\cf4 length\cf0 ; \cf5 a\cf0 ++)\
+		\{\
+			\
+			\cf3 //looping through squares in cardinalities\cf0 \
+			\cf2 for\cf0 (\cf2 int\cf0  \cf5 b\cf0  = 0; \cf5 b\cf0  < \cf5 combos\cf0 [\cf5 a\cf0 ].\cf4 length\cf0 ; \cf5 b\cf0 ++)\
+			\{\
+				\
+				\cf3 //looping through starting point of next possibilities in previous\cf0 \
+				\cf3 //cardinality\cf0 \
+				\cf2 for\cf0 (\cf2 int\cf0  \cf5 c\cf0  = 0; \cf5 c\cf0  < \cf5 combos\cf0 [\cf5 a\cf0 -1].\cf4 length\cf0 ; \cf5 c\cf0 ++)\
+				\{\
+					\cf3 //set the values of this combo based off combo we're building off of\cf0 \
+					\cf3 //we see which we're building off of by checking the 2nd value in the box\cf0 \
+					\cf2 if\cf0 (\cf5 b\cf0  >= \cf5 combos\cf0 [\cf5 a\cf0 -1][\cf5 c\cf0 ][1] && \cf5 b\cf0  < \cf5 combos\cf0 [\cf5 a\cf0 -1][\cf5 c\cf0 +1][1])\
+					\{\
+						\cf3 //putting values of previous row in this row\cf0 \
+						\cf2 for\cf0 (\cf2 int\cf0  \cf5 i\cf0  = 0; \cf5 i\cf0  < \cf5 combos\cf0 [\cf5 a\cf0 -1][\cf5 c\cf0 ].\cf4 length\cf0 ; \cf5 i\cf0 ++)\
+						\{\
+							\cf5 combos\cf0 [\cf5 a\cf0 ][\cf5 b\cf0 ][\cf5 i\cf0 ] = \cf5 combos\cf0 [\cf5 a\cf0 ][\cf5 c\cf0 ][\cf5 i\cf0 ];\
+						\}\
+						\
+						\cf3 //now we build off of the copies of the previous row,\cf0 \
+						\cf3 //and add new brick, changing all values\cf0 \
+						\
+			\
+					\}\
+				\}\
+			\}\
+		\}\
+		\
+		\
+		\
+		\
+		\
+		\
+		\cf3 //cardinality of 2\cf0 \
+	\
+		\cf2 for\cf0 (\cf2 int\cf0  \cf5 b\cf0  = 0; \cf5 b\cf0  < \cf5 combos\cf0 [0][0][2]; \cf5 b\cf0 ++)	\
+		\{\
+			\cf3 //the first combo of cardinality 1's total weight is pasted\cf0 \
+			\cf3 //into all future \ul combos\ulnone  of cardinality 2 that begin w/the same\cf0 \
+			\cf3 //brick that was used in the first combo of cardinality 1\cf0 \
+			\cf5 combos\cf0 [1][\cf5 b\cf0 ][0] = \cf5 combos\cf0 [0][0][1];\
+			\
+			\cf3 //i can \ul calc\ulnone  this later with the rest of the \ul nextcombos\cf0 \ulnone \
+			\cf3 //same way I did it last time\cf0 \
+			\cf5 combos\cf0 [1][\cf5 b\cf0 ][1] = -1;\
+			\
+			\cf3 //adding bricks already used since all these \ul combos\ulnone  are\cf0 \
+			\cf3 //just additions to original 0th combo of cardinality 1\cf0 \
+			\cf5 combos\cf0 [1][\cf5 b\cf0 ][2] = \cf5 combos\cf0 [0][0][2];\
+		\}\
+		\
+		\cf3 //starts at end of previous \ul nextcombos\ulnone , goes until end of this \ul nextcombos\cf0 \ulnone \
+		\cf2 for\cf0 (\cf2 int\cf0  \cf5 b\cf0  = (\cf2 int\cf0 )\cf5 combos\cf0 [0][0][2] + 1; \cf5 b\cf0  < \cf5 combos\cf0 [0][1][2]; \cf5 b\cf0 ++)\
+		\{\
+			\cf5 combos\cf0 [1][\cf5 b\cf0 ][0] = \cf5 combos\cf0 [0][1][1];\
+			\cf5 combos\cf0 [1][\cf5 b\cf0 ][1] = -1;\
+			\cf5 combos\cf0 [1][\cf5 b\cf0 ][2] = \cf5 combos\cf0 [0][1][2];\
+		\}\
+		\
+		\cf2 for\cf0 (\cf2 int\cf0  \cf5 a\cf0 = 0; \cf5 a\cf0  < \cf5 combos\cf0 [1].\cf4 length\cf0 ; \cf5 a\cf0 ++)\
+		\{\
+			\
+		\}\
+		\
+		\
+		\
+		\
+	\}\
+\
+	\cf2 public\cf0  \cf2 int\cf0  Combinations(\cf2 int\cf0  \cf5 n\cf0 , \cf2 int\cf0  \cf5 r\cf0 )\
+	\{\
+		\cf3 //can't choose more out of less\cf0 \
+		\cf2 if\cf0 (\cf5 n\cf0  < \cf5 r\cf0 )\
+		\{\
+			\cf2 return\cf0  0;\
+		\}\
+		\cf2 int\cf0  \cf5 numerator\cf0  = factorial(\cf5 n\cf0 );\
+		\cf2 int\cf0  \cf5 denominator\cf0  = factorial(\cf5 r\cf0 )*factorial(\cf5 n\cf0 -\cf5 r\cf0 );\
+		\cf2 int\cf0  \cf5 combinations\cf0  = \cf5 numerator\cf0 /\cf5 denominator\cf0 ;\
+\
+		\cf2 return\cf0  \cf5 combinations\cf0 ;\
+	\}\
+	\
+	\cf3 //a must be nonnegative\cf0 \
+	\cf2 public\cf0  \cf2 int\cf0  factorial(\cf2 int\cf0  \cf5 a\cf0 )\
+	\{\
+		\cf2 if\cf0 (\cf5 a\cf0  == 0)\
+		\{\
+			\cf2 return\cf0  1;\
+		\}\
+		\
+		\cf2 return\cf0  \cf5 a\cf0  * (factorial(\cf5 a\cf0 -1));\
+	\}\
+	\
+	\
+	\cf3 //returns the number of unused bricks when given the bricks used\cf0 \
+	\cf3 //needed to figure out how many combinations are possible with each beginning\cf0 \
+	\cf3 /*\cf0 \
+\cf3 	 * Example: Array has 1, 2, 3. Choose two from that array:\cf0 \
+\cf3 	 * (1,2), (1,3), and (2,3)\cf0 \
+\cf3 	 * The first array of 1, the set of (1) has 2 other bricks, (2,3), and so there\cf0 \
+\cf3 	 * are two more possible arrays of cardinality two when adding 1 more element to\cf0 \
+\cf3 	 * the original set (1).\cf0 \
+\cf3 	 * \cf0 \
+\cf3 	 * But should only be done from left to right, does that make sense?\cf0 \
+\cf3 	 * As in (1) has 2 elements after it, so 2 possibilities\cf0 \
+\cf3 	 * (2) has 1 element after it, so 1 more possibility\cf0 \
+\cf3 	 * (3) has 0 elements after it, so 0 more possibilities\cf0 \
+\cf3 	 * \cf0 \
+\cf3 	 * \cf0 \
+\cf3 	 * (1,2,3,4)\cf0 \
+\cf3 	 * (1),      (2),      (3),      (4)\cf0 \
+\cf3 	 * (1,2),    (1,3),    (1,4),    (2,3),    (2,4)\cf0 \
+\cf3 	 * (1,2,3),  (1,2,4),  (1,3,4),  (2,3,4)\cf0 \
+\cf3 	 * (1,2,3,4)\cf0 \
+\cf3 	 * \cf0 \
+\cf3 	 * \cf0 \
+\cf3 	 * here's the pattern: the number of elements left to the right of the\cf0 \
+\cf3 	 * LAST element of the set is how many sets can be made from that set by adding 1\cf0 \
+\cf3 	 * w/o double counting or overlapping elsewhere.\cf0 \
+\cf3 	 * \cf0 \
+\cf3 	 * So (2,3) produces 1 more, (2,3,4) in next round b/c (4) is to the right of (3)\cf0 \
+\cf3 	 * \cf0 \
+\cf3 	 * \cf0 \
+\cf3 	 * we could just use the index of the last brick in each combo to see how many\cf0 \
+\cf3 	 * more there are. just do array.length - \ul lastbrickindex\cf0 \ulnone \
+\cf3 	 */\cf0 \
+	\cf2 public\cf0  \cf2 int\cf0  unused()\
+	\{\
+		\
+		\
+		\cf2 return\cf0  -1;\
+	\}\
+\}}
