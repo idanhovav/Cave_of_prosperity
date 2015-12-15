@@ -51,10 +51,10 @@ if __name__ == "__main__":
 		pieces.append(make_int(eval(source.readline())))
 	chosen = list(map(make_float, choose(cap, 0, pieces)))
 	a = 1
-	name = "output" + str(a)
+	name = "out/output" + str(a)
 	while os.path.exists(name):
 		a += 1
-		name = "output" + str(a)
+		name = "out/output" + str(a)
 	out = open(name, 'w')
 	out.write(str(sum(chosen)))
 	for x in chosen:
