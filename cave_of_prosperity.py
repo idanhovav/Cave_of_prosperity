@@ -38,7 +38,7 @@ def make_int(x):
 	return x * (10 ** 7)
 
 def make_float(x):
-	return x / (10 ** 7)
+	return round(x / (10 ** 7), 8)
 
 
 if __name__ == "__main__":
